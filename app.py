@@ -36,7 +36,10 @@ if koumpi:
         "ΗΜΕΡΟΜΗΝΙΑ": hm,
         "ΠΕΡΙΓΡΑΦΗ": per,
     } 
-    keimeno= f" Προστέθηκε , {epil} , {poso}$ , {kat}, {hm}, {per}"
+    if sunal["ΠΕΡΙΓΡΑΦΗ"]:
+        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}- {per}"
+    else:
+        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}-  'Δεν υπάρχει περιγραφή'"
     st.success(keimeno, icon="✅" )
     st.session_state["kiniseis"].append(sunal) 
     pinakas=pd.DataFrame(st.session_state["kiniseis"])
@@ -57,9 +60,9 @@ for i in st.session_state["kiniseis"]:
 
 
 lej={
-    "ΣΥΝ. ΕΣΟΔΑ": f"{float(es)} €",
-    "ΣΥΝ. ΕΞΟΔΑ": f"{float(ej)} €",
-    "ΤΡΕΧ. ΥΠΟΛΟΙΠΟ": f"{float(yp)} €"
+    "ΣΥΝ. ΕΣΟΔΑ": f"{es:.2f} €",
+    "ΣΥΝ. ΕΞΟΔΑ": f"{ej:.2f} €",
+    "ΤΡΕΧ. ΥΠΟΛΟΙΠΟ": f"{yp:.2f} €"
 }
 st.subheader("Στοιχεία λογαριασμού")
 
