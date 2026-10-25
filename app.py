@@ -31,7 +31,7 @@ if epil=="Έσοδο":
     kat=st.selectbox("Δώστε κατηγορία συναλλαγής", [ "Μισθός", "Δώρο", "Πώληση", "Άλλο"])
 else:
     kat=st.selectbox("Δώστε κατηγορία συναλλαγής", ["Φαγητό", "Ενοίκιο", "Μεταφορές", "Διασκέδαση", "Άλλο"])
-hm= st.date_input("Δώστε ημερομηνία συναλλαγής")
+hm= st.date_input("Δώστε ημερομηνία συναλλαγής", format= "DD/MM/YYYY")
 per= st.text_area("Περιγράψτε τη συναλλαγή")
 
 
@@ -45,10 +45,10 @@ if koumpi and poso > 0.0:
         "ΠΕΡΙΓΡΑΦΗ": per,
     } 
     if sunal["ΠΕΡΙΓΡΑΦΗ"]:
-        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}- {per}"
+        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%Y")}- {per}"
     else:
         per="Δεν υπάρχει περιγραφή"
-        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}-  {per}"
+        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%Y")}-  {per}"
     st.success(keimeno, icon="✅" )
     st.session_state["kiniseis"].append(sunal) 
     pinakas=pd.DataFrame(st.session_state["kiniseis"])
