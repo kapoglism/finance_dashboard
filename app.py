@@ -1,7 +1,11 @@
+#=============================Εισαγωγή βιβλιοθηκών===============================
+
 import streamlit as st
 import plotly.express as px
 import pandas as pd
 import os 
+
+#============================Διάβασμα από το αρχείο CSV==================
 
 if "kiniseis" not in st.session_state:
     if os.path.exists("pinakas.csv"):
@@ -9,7 +13,8 @@ if "kiniseis" not in st.session_state:
         st.session_state["kiniseis"]=arxeio.to_dict("records")
     else:
         st.session_state["kiniseis"]=[]
-
+        
+#==============================Καλωσόρισμα χρήστη=====================
 
 st.title("Τα οικονομικά μου")
 st.write("Καλωσήρθατε στην εφαρμογή \"Τα οικονομικά μου\"! Αυτή η εφαρμογή σας βοηθά να παρακολουθείτε τα οικονομικά σας και να διαχειρίζεστε τον προϋπολογισμό σας.")
@@ -17,15 +22,15 @@ name = st.text_input("Παρακαλώ δώστε το όνομα σας")
 if name: 
     st.write("Γεια σου", name, "! Είμαι εδώ για να σε βοηθήσω να παρακολουθείς τα οικονομικά σου.")
 
-
+#=============================Εισαγωγή στοιχείων====================
 st.subheader("Νέα κίνηση-Καταχώρηση Εσόδων και Εξόδων")
 epil=st.selectbox("Δώσε επιλογή",["Έσοδο", "Έξοδο"])
-
 
 poso= st.number_input("Δώσε ποσό καταχώρησης", min_value=0.0 )  
 kat=st.selectbox("Δώσε κατηγορία συναλλαγής", ["Φαγητό", "Ενοίκιο", "Μεταφορές", "Διασκέδαση", "Μισθός", "Άλλο"])
 hm= st.date_input("Δώσε ημερομηνία συναλλαγής")
 per= st.text_area("Περιέγραψε τη συναλλαγή")
+
 
 koumpi= st.button("ΠΡΟΣΘΗΚΗ")
 if koumpi:
@@ -46,9 +51,10 @@ if koumpi:
     pinakas=pd.DataFrame(st.session_state["kiniseis"])
     pinakas.to_csv("pinakas.csv",index=False) 
     
+#===============================Διαγραφή εσόδων/εξόδων==========================
 
-etiketes=[]        #Διαγραφή εσόδων/εξόδων
-k=1
+etiketes=[]        
+k=1 #κρατάω τον αριθμό κ για να ξέρω ποιό στοιχείο να διαγράψω
 for i in st.session_state["kiniseis"]:
     etiketes.append(f" Κίνηση: {k}    {i['ΕΠΙΛΟΓΗ']} - {i['ΠΟΣΟ']:.2f}€ - {i['ΚΑΤΗΓΟΡΙΑ']} - {i['ΗΜΕΡΟΜΗΝΙΑ']} - {i['ΠΕΡΙΓΡΑΦΗ']} ")
     k=k+1
@@ -70,12 +76,15 @@ if etiketes:
         pinakas=pd.DataFrame(st.session_state["kiniseis"])
         pinakas.to_csv("pinakas.csv", index=False)
         if len(st.session_state["kiniseis"])==0:
+            #Διαγράφω τον πίνακα γιατί, όταν διαγράφω την τελευταία κίνηση, το πρόγραμμα θα προσπαθήσει να διαβάσει ένα κενό αρχείο
             os.remove("pinakas.csv")     
-        st.rerun()
+         # Το κάνω για να ανανεώνει τη σελίδα, ώστε η διαγραμμένη κίνηση να φύγει και από το μενού που βλέπει ο χρήστης χωρίς τη χρήση f5
+        st.rerun()   
 if "minima" in st.session_state:
-    st.success(st.session_state["minima"])     #////Διαγραφή εσόδων/εξόδων
-    del st.session_state["minima"]
+    st.success(st.session_state["minima"])    
+    del st.session_state["minima"]                  
 
+#==================================Συνολικά στοιχεία λογαριασμού===============================
 
 es=0
 ej=0
@@ -88,14 +97,12 @@ for i in st.session_state["kiniseis"]:
         ej=ej+i["ΠΟΣΟ"]
         yp=yp-i["ΠΟΣΟ"]
 
-
 lej={
     "ΣΥΝ. ΕΣΟΔΑ": f"{es:.2f} €",
     "ΣΥΝ. ΕΞΟΔΑ": f"{ej:.2f} €",
     "ΤΡΕΧ. ΥΠΟΛΟΙΠΟ": f"{yp:.2f} €"
 }
 st.subheader("Στοιχεία λογαριασμού")
-
 
 aristera, mesh, dexia= st.columns(3)
 with aristera: 
@@ -113,14 +120,15 @@ if st.session_state["kiniseis"]:
     st.table(st.session_state["kiniseis"])
 else:
     st.write("-Δεν βρέθηκαν κινήσεις")
-
-pita={"Φαγητό": 0,               #διαγραμμα πίτας εξόδων
+    
+ #=================================== Διάγραμμα πίτας εξόδων======================================
+ 
+pita={"Φαγητό": 0,              
     "Ενοίκιο": 0,
     "Μεταφορές": 0,
     "Διασκέδαση": 0,
     "Άλλο": 0
 }
-
 for i in st.session_state["kiniseis"]:
     if i["ΕΠΙΛΟΓΗ"]== "Έξοδο":
         if i["ΚΑΤΗΓΟΡΙΑ"]=="Φαγητό":
