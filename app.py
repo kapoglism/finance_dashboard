@@ -1,14 +1,14 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-import os as os
+import os 
 
 if "kiniseis" not in st.session_state:
     if os.path.exists("pinakas.csv"):
         arxeio=pd.read_csv("pinakas.csv")
         st.session_state["kiniseis"]=arxeio.to_dict("records")
     else:
-        st.session_state["kiniseis"]= []
+        st.session_state["kiniseis"]=[]
 
 
 st.title("Τα οικονομικά μου")
@@ -39,14 +39,44 @@ if koumpi:
     if sunal["ΠΕΡΙΓΡΑΦΗ"]:
         keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}- {per}"
     else:
-        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}-  'Δεν υπάρχει περιγραφή'"
+        per="Δεν υπάρχει περιγραφή"
+        keimeno= f" Προστέθηκε: {epil}  - {poso:.2f}€  - {kat}-  {hm.strftime("%d/%m/%y")}-  {per}"
     st.success(keimeno, icon="✅" )
     st.session_state["kiniseis"].append(sunal) 
     pinakas=pd.DataFrame(st.session_state["kiniseis"])
     pinakas.to_csv("pinakas.csv",index=False) 
     
-    
-    
+
+etiketes=[]        #Διαγραφή εσόδων/εξόδων
+k=1
+for i in st.session_state["kiniseis"]:
+    etiketes.append(f" Κίνηση: {k}    {i['ΕΠΙΛΟΓΗ']} - {i['ΠΟΣΟ']:.2f}€ - {i['ΚΑΤΗΓΟΡΙΑ']} - {i['ΗΜΕΡΟΜΗΝΙΑ']} - {i['ΠΕΡΙΓΡΑΦΗ']} ")
+    k=k+1
+if etiketes:
+    st.subheader("Διαγραφή εσόδων/εξόδων")
+    x=st.selectbox("Επέλεξε έσοδο/έξοδο για διαγραφή", etiketes)
+    diagr=st.button("Διαγραφή")
+    if diagr:
+        pl=0
+        j=0
+        while j<len(etiketes):
+            if x==etiketes[j]:
+                pl=j
+                break
+            j=j+1      
+        st.session_state["kiniseis"].pop(pl) 
+        st.session_state["minima"]=f"✔️  Διαγράφτηκε η κίνηση με αριθμό: {pl+1}"
+       
+        pinakas=pd.DataFrame(st.session_state["kiniseis"])
+        pinakas.to_csv("pinakas.csv", index=False)
+        if len(st.session_state["kiniseis"])==0:
+            os.remove("pinakas.csv")     
+        st.rerun()
+if "minima" in st.session_state:
+    st.success(st.session_state["minima"])     #////Διαγραφή εσόδων/εξόδων
+    del st.session_state["minima"]
+
+
 es=0
 ej=0
 yp=0
