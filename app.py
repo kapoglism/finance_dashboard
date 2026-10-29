@@ -86,14 +86,33 @@ if etiketes:
         st.rerun()   
 if "minima" in st.session_state:
     st.success(st.session_state["minima"])    
-    del st.session_state["minima"]                  
+    del st.session_state["minima"]    
+    
+#==================================Φίλτρο ανά μηνα=============================================         
+st.subheader("Φιλτράρισμα ανά μήνα")
+mhnes=["Όλοι","Ιανουάριος", "Φεβρουάριος", "Μάρτιος", "Απρίλιος", "Μάιος", "Ιούνιος", "Ιούλιος", "Αύγουστος", "Σεπτέμβριος", "Οκτώβριος", "Νοέμβριος", "Δεκέμβριος"]
+mhn=st.selectbox("Επιλέξτε μήνα", mhnes)
+ar=mhnes.index(mhn)
+lista2=[]
+for i in st.session_state["kiniseis"]:             
+    y=str(i["ΗΜΕΡΟΜΗΝΙΑ"])
+    lista2.append(int(y[5:7]))
+metr=0
+lista4=[]
+for i in st.session_state["kiniseis"]: 
+    if ar==0:   #σημαινει οτι η επιλογη ειναι "ολοι"-το εβαλα ξεχωριστα για να παρει ολους τους μηνες
+        lista4.append(i) 
+    elif ar==lista2[metr]:
+        lista4.append(i)        
+    metr=metr+1 
+
 
 #==================================Συνολικά στοιχεία λογαριασμού===============================
 
 es=0
 ej=0
 yp=0
-for i in st.session_state["kiniseis"]:
+for i in lista4:
     if i["ΕΠΙΛΟΓΗ"]=="Έσοδο":
         es=es+i["ΠΟΣΟ"]
         yp=yp+i["ΠΟΣΟ"]
@@ -108,6 +127,11 @@ lej={
 }
 st.subheader("Στοιχεία λογαριασμού")
 
+if ar!=0:   #η επιλογή αφορά συγκεκριμένο μήνα
+    st.write("Τα παρακάτω στοιχεία αφορούν τον μήνα που επιλέξατε")
+else:
+    st.write("Τα παρακάτω στοιχεία αφορούν όλους τους μήνες")
+
 aristera, mesh, dexia= st.columns(3)
 with aristera: 
     st.metric("ΣΥΝ. ΕΣΟΔΑ💰",lej["ΣΥΝ. ΕΣΟΔΑ"])
@@ -121,19 +145,23 @@ if yp<0:
 
 if st.session_state["kiniseis"]:
     st.subheader("Οι κινήσεις μου")
-    st.table(st.session_state["kiniseis"])
+    if ar!=0:   #η επιλογή αφορά συγκεκριμένο μήνα
+            st.write("Τα παρακάτω στοιχεία αφορούν τον μήνα που επιλέξατε")
+    else:
+            st.write("Τα παρακάτω στοιχεία αφορούν όλους τους μήνες")
+    st.table(lista4)
 else:
     st.write("-Δεν βρέθηκαν κινήσεις")
     
  #=================================== Διάγραμμα πίτας εξόδων======================================
- 
+
 pita={"Φαγητό": 0,              
     "Ενοίκιο": 0,
     "Μεταφορές": 0,
     "Διασκέδαση": 0,
     "Άλλο": 0
 }
-for i in st.session_state["kiniseis"]:
+for i in lista4:
     if i["ΕΠΙΛΟΓΗ"]== "Έξοδο":
         if i["ΚΑΤΗΓΟΡΙΑ"]=="Φαγητό":
             pita["Φαγητό"]=pita["Φαγητό"]+i["ΠΟΣΟ"]
@@ -152,6 +180,11 @@ pita_px=px.pie(names=onomata, values=times)
 
 if ej>0:
     st.subheader("Γράφημα εξόδων")
+    if ar!=0:   #η επιλογή αφορά συγκεκριμένο μήνα
+        st.write("Τα παρακάτω στοιχεία αφορούν τον μήνα που επιλέξατε")
+    else:
+        st.write("Τα παρακάτω στοιχεία αφορούν όλους τους μήνες")
+    
     st.write("Στο παρακάτω διάγραμμα πίτας φαίνεται η κατανομή των εξόδων σας στις διάφορες κατηγορίες")
     st.write(pita_px)   
 else: 
