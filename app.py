@@ -15,7 +15,7 @@ KAT_EXODA=["Φαγητό", "Ενοίκιο", "Μεταφορές", "Διασκέ
 
 if "kiniseis" not in st.session_state:
     if os.path.exists(ARXEIO):
-        arxeio=pd.read_csv(ARXEIO)
+        arxeio=pd.read_csv(ARXEIO,keep_default_na=False)
         st.session_state["kiniseis"]=arxeio.to_dict("records")
     else:
         st.session_state["kiniseis"]=[]
