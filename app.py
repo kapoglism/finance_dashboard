@@ -5,11 +5,17 @@ import plotly.express as px
 import pandas as pd
 import os 
 
+
+#============================Αρχικοποίηση σταθερών=============================
+ARXEIO="pinakas.csv"
+KAT_ESODA=[ "Μισθός", "Δώρο", "Πώληση", "Άλλο"]
+KAT_EXODA=["Φαγητό", "Ενοίκιο", "Μεταφορές", "Διασκέδαση", "Άλλο"]
+
 #============================Διάβασμα από το αρχείο CSV==================
 
 if "kiniseis" not in st.session_state:
-    if os.path.exists("pinakas.csv"):
-        arxeio=pd.read_csv("pinakas.csv")
+    if os.path.exists(ARXEIO):
+        arxeio=pd.read_csv(ARXEIO)
         st.session_state["kiniseis"]=arxeio.to_dict("records")
     else:
         st.session_state["kiniseis"]=[]
@@ -28,9 +34,9 @@ epil=st.selectbox("Δώστε επιλογή",["Έσοδο", "Έξοδο"])
 
 poso= st.number_input("Δώστε ποσό καταχώρησης", min_value=0.0 )
 if epil=="Έσοδο":
-    kat=st.selectbox("Δώστε κατηγορία συναλλαγής", [ "Μισθός", "Δώρο", "Πώληση", "Άλλο"])
+    kat=st.selectbox("Δώστε κατηγορία συναλλαγής", KAT_ESODA)
 else:
-    kat=st.selectbox("Δώστε κατηγορία συναλλαγής", ["Φαγητό", "Ενοίκιο", "Μεταφορές", "Διασκέδαση", "Άλλο"])
+    kat=st.selectbox("Δώστε κατηγορία συναλλαγής", KAT_EXODA)
 hm= st.date_input("Δώστε ημερομηνία συναλλαγής", format= "DD/MM/YYYY")
 per= st.text_area("Περιγράψτε τη συναλλαγή")
 
@@ -52,7 +58,7 @@ if koumpi and poso > 0.0:
     st.success(keimeno, icon="✅" )
     st.session_state["kiniseis"].append(sunal) 
     pinakas=pd.DataFrame(st.session_state["kiniseis"])
-    pinakas.to_csv("pinakas.csv",index=False) 
+    pinakas.to_csv(ARXEIO,index=False) 
 elif koumpi and poso <= 0.0:
     st.error("⚠️ Προσοχή! Προσθέστε έγκυρο ποσό")    
 #===============================Διαγραφή εσόδων/εξόδων==========================
@@ -78,10 +84,10 @@ if etiketes:
         st.session_state["minima"]=f"✔️  Διαγράφτηκε η κίνηση με αριθμό: {pl+1}"
        
         pinakas=pd.DataFrame(st.session_state["kiniseis"])
-        pinakas.to_csv("pinakas.csv", index=False)
+        pinakas.to_csv(ARXEIO, index=False)
         if len(st.session_state["kiniseis"])==0:
             #Διαγράφω τον πίνακα γιατί, όταν διαγράφω την τελευταία κίνηση, το πρόγραμμα θα προσπαθήσει να διαβάσει ένα κενό αρχείο
-            os.remove("pinakas.csv")     
+            os.remove(ARXEIO)     
          # Το κάνω για να ανανεώνει τη σελίδα, ώστε η διαγραμμένη κίνηση να φύγει και από το μενού που βλέπει ο χρήστης χωρίς τη χρήση f5
         st.rerun()   
 if "minima" in st.session_state:
