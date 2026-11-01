@@ -189,3 +189,34 @@ if ej>0:
     st.write(pita_px)   
 else: 
     st.write("-Το διάγραμμα θα εμφανιστεί μόλις προσθέσετε τα έξοδα σας")
+    
+
+#=======================================Πορεία υπολοίπου=======================================================
+    
+st.subheader("Πορεία υπολοίπου")
+
+zevgaria=[]
+hmeromhnies=[]
+for i in st.session_state["kiniseis"]:
+    zevgaria.append([str(i["ΗΜΕΡΟΜΗΝΙΑ"]),i["ΠΟΣΟ"], i["ΕΠΙΛΟΓΗ"]])
+zevgaria.sort()             
+
+yp=0
+ypoloipo=[]
+
+for i in zevgaria:
+    hmeromhnies.append(i[0])
+    if i[2]=="Έσοδο":
+        yp=yp+i[1]
+        ypoloipo.append(yp)
+    else:
+        yp=yp-i[1]
+        ypoloipo.append(yp)
+
+if hmeromhnies and ypoloipo:
+    grafhma=px.line(x=hmeromhnies,y=ypoloipo)
+    st.write(grafhma)
+else:
+    st.write("Το γράφημα πορείας υπολοίπου θα εμφανιστεί μόλις προσθέσετε τις κινήσεις σας")
+
+    
